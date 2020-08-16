@@ -1,0 +1,10 @@
+[package]
+name = "bevy_pong"
+version = "0.1.0"
+authors = ["erasin <erasinoo@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+# bevy = { path = "/Users/erasin/Development/rust/game/bevy" }
+bevy = "*"
+rand = "0.7"
