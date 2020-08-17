@@ -66,16 +66,24 @@ fn setup(
     commands
         .spawn(Camera2dComponents::default())
         .spawn(UiCameraComponents::default())
+        .spawn(SpriteComponents{
+            material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
+            translation: Translation(Vec3::new(0.0, 0.0, 0.0)),
+            sprite: Sprite { 
+                size: Vec2::new(5.0, 5.0),
+            },
+            ..Default::default()
+        })
         .spawn(SpriteComponents {
-            material: materials.add(Color::rgb(0.3, 0.2, 0.4).into()),
-            translation: Translation(Vec3::new(0.0, 215.0, 0.0)),
-            sprite: Sprite {
-                size: Vec2::new(120.0, 30.0),
+            material: materials.add(Color::rgb(0.0, 1.0, 0.0).into()),
+            translation: Translation(Vec3::new(-380.0, 10.0, 0.0)),
+            sprite: Sprite { 
+                size: Vec2::new(30.0, 120.0),
             },
             ..Default::default()
         })
         .with(Racket{
-            name:"player A".to_string(),
+            name:"用户A".to_string(),
             store:0,
             key1: KeyCode::A,
             key2: KeyCode::D,
@@ -85,9 +93,9 @@ fn setup(
         // 用户2
         .spawn(SpriteComponents {
             material: materials.add(Color::rgb(1.0, 0.0, 0.0).into()),
-            translation: Translation(Vec3::new(0.0, -215.0, 0.0)),
+            translation: Translation(Vec3::new(380.0, 10.0, 0.0)),
             sprite: Sprite {
-                size: Vec2::new(120.0, 30.0),
+                size: Vec2::new(30.0, 120.0),
             },
             ..Default::default()
         })
@@ -110,12 +118,12 @@ fn setup(
         })
         .with(Ball {
             // velocity:Vec3::new(0.0,0.0,0.0).normalize(),
-            velocity: 400.0 * Vec3::new(0.5, -0.5, 0.0).normalize(),
+            velocity: 400.0 * Vec3::new(-0.5, 0.5, 0.0).normalize(),
         })
         // 记分板
         .spawn(TextComponents {
             text: Text {
-                font: asset_server.load("assets/fonts/CascadiaCode.ttf").unwrap(),
+                font: asset_server.load("assets/fonts/站酷酷黑体.ttf").unwrap(),
                 value: "Score:".to_string(),
                 style: TextStyle {
                     color: Color::rgb(0.2, 0.2, 0.8).into(),
@@ -222,10 +230,10 @@ fn racket_movement_system(
             direction += 1.0;
         }
 
-        *translation.0.x_mut() += time.delta_seconds * direction * 500.0;
+        *translation.0.y_mut() += time.delta_seconds * direction * 500.0;
 
         // bound the racket within the walls
-        *translation.0.x_mut() = f32::max(-380.0, f32::min(380.0, translation.0.x()));
+        *translation.0.y_mut() = f32::max(-180.0, f32::min(180.0, translation.0.y()));
     }
 }
 
@@ -252,15 +260,15 @@ fn ball_collision_system(
         let velocity = &mut ball.velocity;
 
         // check collision with walls
-        for (collider_entity, collider, translation, sprite) in &mut collider_query.iter() {
+        for (_collider_entity, collider, translation, sprite) in &mut collider_query.iter() {
             let collision = collide(ball_translation.0, ball_size, translation.0, sprite.size);
             if let Some(collision) = collision {
                 // scorable colliders should be despawned and increment the scoreboard on collision
                 if let &Collider::Solid = collider {
                     // 标记1分 event
                     match collision {
-                        Collision::Top => my_events.send(MyEvent::Reset(Player::User1)),
-                        Collision::Bottom => my_events.send(MyEvent::Reset(Player::User2)),
+                        Collision::Left => my_events.send(MyEvent::Reset(Player::User1)),
+                        Collision::Right => my_events.send(MyEvent::Reset(Player::User2)),
                         _ => {}
                     }
                 };
@@ -323,12 +331,14 @@ fn event_listener_system(
                         // todo over
                     }
                     let mut y = rand::random::<f32>();
+                    let mut x = rand::random::<f32>();
                     if *p == Player::User1 {
                         y = -y;
+                        x = -x;
                     }
                     for (mut ball, mut trans) in &mut balls.iter() {
                         trans.0 = Vec3::new(0.0, 50.0, 0.0);
-                        ball.velocity = 400.0 * Vec3::new(0.5, y, 0.0).normalize();
+                        ball.velocity = 400.0 * Vec3::new(x, y, 0.0).normalize();
                     }
                 }
                 MyEvent::Over => {

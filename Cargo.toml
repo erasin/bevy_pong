@@ -5,6 +5,5 @@ authors = ["erasin <erasinoo@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-# bevy = { path = "/Users/erasin/Development/rust/game/bevy" }
 bevy = "*"
 rand = "0.7"
