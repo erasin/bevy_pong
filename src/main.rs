@@ -63,6 +63,9 @@ fn setup(
     mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
+
+    let font_kuhei = asset_server.load("assets/fonts/站酷酷黑体.ttf").unwrap();
+
     commands
         .spawn(Camera2dComponents::default())
         .spawn(UiCameraComponents::default())
@@ -100,7 +103,7 @@ fn setup(
             ..Default::default()
         })
         .with(Racket{
-            name:"player B".to_string(),
+            name:"用户B".to_string(),
             store:0,
             key1: KeyCode::Left,
             key2: KeyCode::Right,
@@ -123,7 +126,7 @@ fn setup(
         // 记分板
         .spawn(TextComponents {
             text: Text {
-                font: asset_server.load("assets/fonts/站酷酷黑体.ttf").unwrap(),
+                font: font_kuhei,
                 value: "Score:".to_string(),
                 style: TextStyle {
                     color: Color::rgb(0.2, 0.2, 0.8).into(),
@@ -144,7 +147,7 @@ fn setup(
         .with(Player::User1)
         .spawn(TextComponents {
             text: Text {
-                font: asset_server.load("assets/fonts/CascadiaCode.ttf").unwrap(),
+                font: font_kuhei, 
                 value: "Score:".to_string(),
                 style: TextStyle {
                     color: Color::rgb(1.0, 0.2, 0.8).into(),
